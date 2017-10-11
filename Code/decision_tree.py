@@ -14,7 +14,6 @@ def createTwoClusters(mean1, mean2, cov1, cov2, npoints):
     x2, y2 = np.random.multivariate_normal(mean2, cov2, npoints).T
     return x1, y1, x2, y2
 
-
 def plotData(cluster1,cluster2):
     plt.plot(cluster1[:,0], cluster1[:,1], 'x')
     plt.plot(cluster2[:,0], cluster2[:,1], 'o')
@@ -22,7 +21,6 @@ def plotData(cluster1,cluster2):
     plt.grid()
     plt.savefig("/Users/cyrilwendl/Documents/EPFL/Projet SIE/SIE-Project/random_data.pdf", bbox_inches='tight')
     plt.show()
-
 
 def entropy(labels, base=None):  # [1]
     value, counts = np.unique(labels, return_counts=True)
