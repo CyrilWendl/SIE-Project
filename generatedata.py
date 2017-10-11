@@ -90,7 +90,7 @@ cluster2=np.unique(np.round(list(zip(x2,y2,np.ones(len(x2))*2))),axis=0) # np.on
 # connect unique points of cluster 1 and cluster 2
 dataset=np.asarray(np.concatenate((cluster2,cluster1),axis=0))
 #plotData(cluster1,cluster2)
-#print(dataset) #test
+#print(dataset)
 
 dfs=[]
 entropy_attr=[]
