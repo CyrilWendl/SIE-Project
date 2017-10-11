@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# test commit from Pycharm
+# test commit from Pycharm #commit
 
 def createTwoClusters(mean1,mean2,cov1,cov2):
     x1, y1 = np.random.multivariate_normal(mean1, cov1, 500).T
