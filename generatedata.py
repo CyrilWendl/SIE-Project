@@ -28,7 +28,7 @@ def entropy(labels, base=None):  # [1]
     value, counts = np.unique(labels, return_counts=True)
     norm_counts = counts / counts.sum()
     base = e if base is None else base
-    return -(norm_counts * np.log(norm_counts) / np.log(base)).sum()
+    return np.abs(-(norm_counts * np.log(norm_counts) / np.log(base)).sum())
 
 def differentialEntropy():
     pass
@@ -89,20 +89,23 @@ cluster2=np.unique(np.round(list(zip(x2,y2,np.ones(len(x2))*2))),axis=0) # np.on
 
 # connect unique points of cluster 1 and cluster 2
 dataset=np.asarray(np.concatenate((cluster2,cluster1),axis=0))
-plotData(cluster1,cluster2)
+#plotData(cluster1,cluster2)
 #print(dataset)
 
 dfs=[]
-for attribute in ["x",0],["y",1]:
-    print(attribute[1])
-    entropy_vals_attr, xs_vals_attr = \
-        entropy_discrete(col_index=attribute[1], dataset=dataset)
+entropy_attr=[]
+x_attr=[]
+attributes=["x","y"]
 
-    df=pd.DataFrame(entropy_vals_attr, xs_vals_attr)
-    df.reset_index(inplace=True)
-    df.columns=(["split_"+attribute[0],"Entropy"])
-    print(df)
-    dfs.append(df)
+for attribute_ind in range(np.shape(dataset,)[1]-1):
+    entropy_vals_attr, xs_vals_attr = entropy_discrete(col_index=attribute_ind, dataset=dataset)
+    x_attr.append(xs_vals_attr)
+    entropy_attr.append(np.asarray(entropy_vals_attr))
+
+ind_attr=1
+df=pd.DataFrame(x_attr[ind_attr], entropy_attr[ind_attr])
+df.columns=([attributes[ind_attr]])
+print(df)
 
 # [1] https://machinelearningmastery.com/implement-decision-tree-algorithm-scratch-python/
 # [2] https://stackoverflow.com/questions/15450192/fastest-way-to-compute-entropy-in-python
