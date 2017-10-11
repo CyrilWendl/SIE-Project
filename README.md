@@ -1,4 +1,4 @@
-# SIE-Project
+# SIE Project 2017
 Folder for various codes for the SIE project at EPFL in FS 2017.
 
 ## Files
@@ -11,3 +11,5 @@ PDF articles explaining the methodology
 ## Supervisors:
 - Devis Tuia, University of Wageningen
 - Diego Marcos González, University of Wageningen
+
+Cyril Wendl, 2017
