@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from math import log, e
 import pylab
 
@@ -14,13 +15,12 @@ def createTwoClusters(mean1, mean2, cov1, cov2, npoints):
     return x1, y1, x2, y2
 
 
-def plotData(x_c1, y_c1, x_c2, y_c2):
-    plt.plot(x_c1, y_c1, 'x')
-    plt.plot(x_c1, y_c2, 'o')
+def plotData(cluster1,cluster2):
+    plt.plot(cluster1[:,0], cluster1[:,1], 'x')
+    plt.plot(cluster2[:,0], cluster2[:,1], 'o')
     plt.axis('equal')
-    # DefaultSize = F.get_size_inches()
-    # F.set_size_inches((DefaultSize[0] * 1.5, DefaultSize[1] * 1.8))
-    # plt.savefig("/Users/cyrilwendl/Documents/EPFL/Projet SIE/SIE-Project/random_data.pdf", bbox_inches='tight')
+    plt.grid()
+    plt.savefig("/Users/cyrilwendl/Documents/EPFL/Projet SIE/SIE-Project/random_data.pdf", bbox_inches='tight')
     plt.show()
 
 
@@ -32,9 +32,7 @@ def entropy(labels, base=None):  # [1]
 
 def differentialEntropy():
     pass
-    """
-    TODO implement: Gaussian entropy for continuous variables
-    """
+    # TODO implement: Gaussian entropy for continuous variables
 
 def split(index, value, dataset):  # [2]
     left, right = list(), list()
@@ -45,49 +43,66 @@ def split(index, value, dataset):  # [2]
             right.append(row)
     return left, right
 
-
-mean1 = [0, 50]
-cov1 = [[1, 0], [0, 10]]  # diagonal covariance
-
-mean2 = [50, 0]
-cov2 = [[20, 50], [50, 20]]  # diagonal covariance
-
-# x1,y1,x2,y2=createTwoClusters(mean1,mean2,cov1,cov2,100)
-# plotData(np.round(x1),np.round(y1),np.round(x2),np.round(y2))
-
-# 1D labels
-labels = [2, 1, 2, 2, 2, 1, 1, 1, 1]
-x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-dataset = np.array([x, labels]).T  # organise data in rows (columns = variables)
-
-
-# TODO Loop over all attributes
-def loop_attribute(col_index):
+def entropy_discrete(dataset, col_index):
+    """
+    Parameters
+    ----------
+    dataset :
+        Input array with data and label in rows. The last column contains the labels.
+    col_index :
+        The index of the column for which the entropy should be computed.
+    """
     x_vals, entropy_vals = list(), list()
-
-    for split_x in range(2, len(x) + 1):
+    uniquevals=(np.unique(dataset[:,col_index]))
+    for split_x in uniquevals[1:]:
         x_vals.append(split_x)
 
+        # split
         left, right = split(col_index, split_x, dataset)
         left = np.asarray(left)
         right = np.asarray(right)
 
+        # labels
         left_labels = left[:, -1]  # last column = labels
         right_labels = right[:, -1]
 
+        # entropy
         left_entropy = entropy(left_labels, base=2)
         right_entropy = entropy(right_labels, base=2)
 
-        entropy_attr_split = left_entropy * len(left) / len(x) + right_entropy * len(right) / len(x)
-
+        # total entropy for attribute
+        entropy_attr_split = left_entropy * len(left) / len(dataset) + right_entropy * len(right) / len(dataset)
         entropy_vals.append(entropy_attr_split)
 
     return entropy_vals, x_vals
 
+mean1 = [18, 30]
+cov1 = [[1, 0], [0, 1]]  # diagonal covariance
+mean2 = [15, 40]
+cov2 = [[2, 0], [0, 2]]  # diagonal covariance
+x1,y1,x2,y2=createTwoClusters(mean1,mean2,cov1,cov2,30)
 
-entropy_vals, xs_vals = loop_attribute(col_index=0)
-print(np.round(entropy_vals,2))
-print(xs_vals)
+# zip for having tuples (x,y), round and unique for having discrete coordinates (eliminating duplicate points)
+# TODO change to continuous
+cluster1=np.unique(np.round(list(zip(x1,y1,np.ones(len(x1))))),axis=0) # np.ones: label 1 for first cluster
+cluster2=np.unique(np.round(list(zip(x2,y2,np.ones(len(x2))*2))),axis=0) # np.ones*2: label 2 for second cluster
+
+# connect unique points of cluster 1 and cluster 2
+dataset=np.asarray(np.concatenate((cluster2,cluster1),axis=0))
+plotData(cluster1,cluster2)
+#print(dataset)
+
+dfs=[]
+for attribute in ["x",0],["y",1]:
+    print(attribute[1])
+    entropy_vals_attr, xs_vals_attr = \
+        entropy_discrete(col_index=attribute[1], dataset=dataset)
+
+    df=pd.DataFrame(entropy_vals_attr, xs_vals_attr)
+    df.reset_index(inplace=True)
+    df.columns=(["split_"+attribute[0],"Entropy"])
+    print(df)
+    dfs.append(df)
 
 # [1] https://machinelearningmastery.com/implement-decision-tree-algorithm-scratch-python/
 # [2] https://stackoverflow.com/questions/15450192/fastest-way-to-compute-entropy-in-python
