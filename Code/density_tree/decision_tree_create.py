@@ -198,4 +198,4 @@ def create_decision_tree(dimensions = 0, subsample = 0):
     results=[min_df]
     # recursively continue splitting
     next_split(left, right, results, root) # iterate
-    return results, roots, x
+    return results, root

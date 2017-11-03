@@ -1,4 +1,5 @@
 # Binary tree node to save binary tree nodes
+
 class Node:
     """
     constructor for new nodes
@@ -34,8 +35,13 @@ class Node:
             print("split dimension: " + str(self.split_dimension))
             print("split value: " + str(self.split_value))
 
-    """tree traversal methods"""
+    """get tree depth"""
+    def depth(self):
+        left_depth = self.left.depth() if self.left else 0
+        right_depth = self.right.depth() if self.right else 0
+        return max(left_depth, right_depth) + 1
 
+    """traversal methods"""
     def traverse_inorder(self):
         if self.left is not None:
             self.left.traverse_inorder()
@@ -51,9 +57,10 @@ class Node:
             self.right.traverse_preorder()
 
     def traverse_postorder(self):
-        self.__format__()
         if self.left is not None:
             self.left.traverse_preorder()
         if self.right is not None:
             self.right.traverse_preorder()
+        self.__format__()
         raise NotImplementedError
+        
