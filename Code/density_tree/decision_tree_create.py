@@ -42,11 +42,13 @@ def entropy_discrete(dataset, dim):
     x_vals, entropy_vals = list(), list()
     uniquevals = (np.unique(dataset[:, dim]))
     left_labels_unique, right_labels_unique = list(), list()
-
+    
+    # loop all possible split values
     for split_x in uniquevals[1:]:
+        # append value
         x_vals.append(split_x)
 
-        # split
+        # split on value
         left, right = split(dataset, dim, split_x)
         left = np.asarray(left)
         right = np.asarray(right)
@@ -55,12 +57,11 @@ def entropy_discrete(dataset, dim):
         left_labels = left[:, -1]  # last column = labels
         right_labels = right[:, -1]
 
-        # print(" ".join(left_labels))
-
+        # unique labels
         left_labels_unique.append(np.unique(left_labels))
         right_labels_unique.append(np.unique(right_labels))
 
-        # entropy
+        # entropy for split
         left_entropy = entropy(left_labels, base=2)
         right_entropy = entropy(right_labels, base=2)
 
@@ -70,28 +71,6 @@ def entropy_discrete(dataset, dim):
         entropy_vals.append(entropy_attr_split)
 
     return entropy_vals, x_vals, left_labels_unique, right_labels_unique
-
-
-def descend_decision_tree(data_test, node, decision_tree):
-    """given some test data and decision tree, assign the correct label using a decision tree"""
-    # node.__format__()
-    # check left or right side
-    if data_test[node.dimension] < node.split_value:  # split to the left
-        if len(node.labels_left) == 1:  # if there is only one label, return it
-            return int(node.labels_left)
-        else:
-            if node.left_rule is not None:  # else descent
-                for i in decision_tree:
-                    if i.decisionrule == node.left_rule:
-                        return descend_decision_tree(data_test, i, decision_tree)
-    else:  # split to the right
-        if len(node.labels_right) == 1:
-            return int(node.labels_right)
-        else:
-            if node.right_rule is not None:
-                for i in decision_tree:
-                    if i.decisionrule == node.right_rule:
-                        return descend_decision_tree(data_test, i, decision_tree)
 
 
 def data_to_clusters(dataset):
@@ -129,9 +108,10 @@ def calc_entropy_attribute(dataset):
         ul_l, ul_l_c = get_unique_labels(left_l_unique)
         ul_r, ul_r_c = get_unique_labels(right_l_unique)
 
-        # append entropy values for all splits to dataframe
+        # append values for all splits to dataframe
         x_attr.append(xs_vals_attr)
         entropy_attr.append(np.asarray(entropy_vals_attr))
+        
         df = pd.DataFrame({'cut value': x_attr[attribute_ind],
                            'entropy': list(entropy_attr[attribute_ind]),
                            'left clusters': ul_l_c,
@@ -142,6 +122,7 @@ def calc_entropy_attribute(dataset):
                                    'right clusters', 'left labels', 'right labels'])
         df.reset_index(inplace=True)
         dfs.append(df)
+        
     return dfs
 
 
@@ -160,7 +141,7 @@ def get_best_attr(dfs):
     return min_df  # value of lowest entropy after possible cut, cut value, dimension
 
 
-def next_split(left, right, results):
+def next_split(left, right, results, root):
     """
     recursive method to split variables on dimension until all variables are contained in one subspace. G
     1. Get left (l) and right (r) based on split
@@ -169,13 +150,52 @@ def next_split(left, right, results):
     4. Recurse -> 1.
     """
     for side in (left, right):  # loop both sides
-        labels = np.asarray(side)[:, -1]  # get variables (in last column)
-        side = np.asarray(side)
-        if len(np.unique(np.asarray(side)[:, 2])) != 1:  # if there are still more than one labels in a side
+        dt_node = Node() # decision tree node]
+        dt_node.parent = root
+        dt_node.labels = np.unique(np.asarray(side)[:, -1])  # get variables (in last column)
+        
+        if np.array_equal(left, side):
+            dt_node.parent.left = dt_node
+        elif np.array_equal(right, side):
+            dt_node.parent.right = dt_node
+
+        
+        
+        if len(dt_node.labels) > 1:  # if there are still more than one labels in a side
+            side = np.asarray(side)
             dfs = calc_entropy_attribute(side)  # get entropies for all attributes within side
             min_df = get_best_attr(dfs)  # get best split value
-            left_new, right_new = split(side, min_df["dimension"].values[0],
-                                        min_df["cut value"].values[0]) # get new left and right labels
-            # save results for dataframe
+            # dataframe
             results.append(min_df)
-            next_split(left_new, right_new, results)  # split, recursion
+            
+            dt_node.split_value = min_df["cut value"].values[0]
+            dt_node.split_dimension = min_df["dimension"].values[0]
+            left_new, right_new = split(side, 
+                                        dt_node.split_dimension,
+                                        dt_node.split_value) # get new left and right labels
+            
+            # save results for dataframe
+            next_split(left_new, right_new, results, dt_node)  # split, recursion
+            
+def create_decision_tree(dimensions = 0, subsample = 0):
+    """create decision tree be performing initial split,
+    then recursively splitting until all labels are in unique bins
+    """
+    # TODO modify such as to take as entry number of variables to create tree on, number of data subsamples etc.
+    
+    root = Node() # initial node
+    # initial split
+    dfs = calc_entropy_attribute(dataset)
+    min_df = get_best_attr(dfs)
+    
+    root.split_value = min_df["cut value"].values[0]
+    root.split_dimension = min_df["dimension"].values[0]
+    root.labels = np.unique(dataset[:,-1])
+    
+    left,right=split(dataset, 
+                 min_df["dimension"].values[0], # dimension of min cut value
+                 min_df["cut value"].values[0]) # min cut value
+    results=[min_df]
+    # recursively continue splitting
+    next_split(left, right, results, root) # iterate
+    return results, roots, x

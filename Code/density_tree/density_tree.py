@@ -1,11 +1,28 @@
+# %%writefile ./density_tree/density_tree.py
 import numpy as np
-import pandas as pd #TODO remove
+
+def entropy(S, base = 2):  # [1]
+    """
+    Calculate the entropy for a set of data with labels.
+    :param labels: an array of labels
+    :param base: base of entropy, by default e
+    :return: entropy
+    """
+    labels = S[:,-1]
+    value, counts = np.unique(labels, return_counts=True)
+    norm_counts = counts / counts.sum()
+    return -(norm_counts * np.log(norm_counts) / np.log(base)).sum()
 
 def entropy_gaussian(S, base=2):
-    """Differential entropy of a d-variate Gaussian density"""
+    """
+    Differential entropy of a d-variate Gaussian density
+    :param S: dataset in R^(N*D)
+    :param base: base of entropy
+    :return: entropy
+    """
     K = np.linalg.det(np.cov(S.T))
     d = np.shape(S)[1]
-    # entropy = np.dot(np.power((2*np.pi*np.exp(1)),d),K) / 2
+
     entropy = np.multiply(np.power(2 * np.pi * np.exp(1), d), K)
     if entropy < 0:
         return 0
@@ -13,47 +30,43 @@ def entropy_gaussian(S, base=2):
     return entropy
 
 
-def information_gain(S, S_l, S_r, entropy_f=entropy_gaussian):
-    """calculate information gain based on entropy after split"""
-    # entropy
-    entropy_l = entropy_f(S_l, base=2)
-    entropy_r = entropy_f(S_r, base=2)
-    entropy_tot = entropy_f(S, base=2)
-
-    # information gain
-    ig = entropy_tot - (entropy_l * len(S_l) /
-                        len(S) + entropy_r * len(S_r) / len(S))
-
-    return ig, entropy_l, entropy_r, entropy_tot
-
-
-def get_ig_dim(dataset, dim):
-    split_x = 12
-    ig_max = -np.inf
+def get_ig_dim(dataset, dim, entropy_f = entropy_gaussian, base = 2):
+    """for one dimension, get information gain"""
     ig_vals = []
     split_vals = []
-    for split_x in (dataset[2:-1, dim]):  # TODO remove 1:-2, find out why beginning and end cause crash
-        split_vals.append(split_x)
-        split_rand_l = dataset[dataset[:, dim] >= split_x]
-        split_rand_r = dataset[dataset[:, dim] < split_x]
 
-        entropy_gaussian(split_rand_r, base=2)
+    # loop over all possible cut values
+    for split_val in (dataset[:, dim]):  # TODO remove 1:-2, find out why beginning and end cause crash
+        # split values
+        split_rand_l = dataset[dataset[:, dim] >= split_val]
+        split_rand_r = dataset[dataset[:, dim] < split_val]
 
-        ig, entropy_l, entropy_r, entropy_tot = information_gain(dataset, split_rand_l, split_rand_r)
+        # entropy
+        entropy_l = entropy_f(split_rand_l, base=base)
+        entropy_r = entropy_f(split_rand_r, base=base)
+        entropy_tot = entropy_f(dataset, base=base)
+
+        # information gain
+        print(len(dataset))
+        ig = entropy_tot - (entropy_l * len(split_rand_l) /
+                            len(dataset) + entropy_r * len(split_rand_r) / len(dataset))
+        # append split value and information gain
+        split_vals.append(split_val)
         ig_vals.append(ig)
-        if ig is not np.nan and ig > ig_max:
-            ig_max = ig
+
     return np.array(ig_vals), np.array(split_vals)
 
+def get_best_split(dataset):
+    """for a given dimension, get best split based on information gain"""
 
-def get_best_split(dataset, dim=0):
-    ig_vals, split_vals = get_ig_dim(dataset, dim)
-    # TODO remove Pandas
-    df = pd.DataFrame(ig_vals, split_vals).reset_index()
-    df.columns = (["possible splits (dim " + str(dim) + ")", "information gain"])
-    display = df
+    # get all information gains on all dimensions
+    ig_dims_vals, split_dims_vals = [], []
+    for dim in range(np.shape(dataset)[1]): # loop all dimensions
+        ig_vals, split_vals = get_ig_dim(dataset, dim)
+        ig_dims_vals.append(ig_vals)
+        split_dims_vals.append(split_vals)
 
-    split_vals_opt = (split_vals[np.argmax(ig_vals)] + split_vals[np.argmax(ig_vals) - 1]) / 2
-    split_vals_opt
+    # select best information gain and dimension
+    # TODO implement
 
-    return split_vals_opt
+    return ig_dims_vals, split_dims_vals
