@@ -1,7 +1,5 @@
 """Functions to generate test data"""
-
-import random
-import numpy as np
+from . import *
 
 def createMeans(clusters, dimensions, minRange=1, maxRange=100):
     """Generate a random mean of n clusters in d dimensions."""
@@ -51,3 +49,10 @@ def createData(clusters, dimensions, covariance, npoints, minRange=1, maxRange=1
     dataset = np.asarray(np.concatenate(clusters, axis=0))
     return dataset, clusters
     # connect unique points of cluster 1 and cluster 2
+
+def data_to_clusters(dataset):
+    '''Helper function to get clusters from estimated labels'''
+    clusters = []
+    for val in np.unique(dataset[:, 2]):
+        clusters.append(dataset[dataset[:, 2] == val])
+    return clusters

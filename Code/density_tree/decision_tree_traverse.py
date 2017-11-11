@@ -1,66 +1,29 @@
+# %%writefile ./density_tree/decision_tree_traverse.py
 # Binary tree node to save binary tree nodes
+"""
+"""
+import numpy as np
 
-class Node:
-    """
-    constructor for new nodes
-    # decision rule is the rule which splits labels in two groups labels_left and labels_right
-    # left_rule and right_rule are pointers to the rules that have to be used
-    # to further split labels_left and labels_right
-    """
+def descend_decision_tree(data_point, node):
+    """given some test data and decision tree, assign the correct label using a decision tree"""
 
-    def __init__(self):
-        # data for node
-        self.parent = None  # parent node
-        self.labels = None  # the labels contained at this split level
-        self.split_value = None  # the split value
-        self.split_dimension = None  # the split dimension
+    # check left or right side
+    if data_point[node.split_dimension] < node.split_value:  # split to the left
+        if len(node.left_labels) == 1:  # if there is only one label, return it
+            return int(node.left_labels)
+        return descend_decision_tree(data_point, node.left)
+    else:  # split to the right
+        if len(node.right_labels) == 1:  # if there is only one label, return it
+            return int(node.right_labels)
+        return descend_decision_tree(data_point, node.right)
 
-        # child nodes
-        self.left = None  # node to the left, e.g., for value < split_value
-        self.left_labels = None
-        self.right = None
-        self.right_labels = None
+def descend_decision_tree_aux(dataset, root):
+    dataset_eval = []
+    for i in dataset: # loop all data points
+        # get labels
+        label=descend_decision_tree(i, root)
+        # append to dataset
+        dataset_eval.append(np.concatenate([i,[label]]))
 
-    """print data for node"""
-
-    def has_children(self):
-        if (self.right != None) & (self.right != None):
-            return True
-        return False
-
-    def __format__(self):
-        # print("rule: " + self.decisionrule) # print a decision rule on one line as a string (e.g., `d(2) < 20`)
-        print("labels: " + str(self.labels))
-        if self.has_children():
-            print("split dimension: " + str(self.split_dimension))
-            print("split value: " + str(self.split_value))
-
-    """get tree depth"""
-    def depth(self):
-        left_depth = self.left.depth() if self.left else 0
-        right_depth = self.right.depth() if self.right else 0
-        return max(left_depth, right_depth) + 1
-
-    """traversal methods"""
-    def traverse_inorder(self):
-        if self.left is not None:
-            self.left.traverse_inorder()
-        self.__format__()
-        if self.right is not None:
-            self.right.traverse_inorder
-
-    def traverse_preorder(self):
-        self.__format__()
-        if self.left is not None:
-            self.left.traverse_preorder()
-        if self.right is not None:
-            self.right.traverse_preorder()
-
-    def traverse_postorder(self):
-        if self.left is not None:
-            self.left.traverse_preorder()
-        if self.right is not None:
-            self.right.traverse_preorder()
-        self.__format__()
-        raise NotImplementedError
-        
+    dataset_eval=np.asarray(dataset_eval)
+    return dataset_eval

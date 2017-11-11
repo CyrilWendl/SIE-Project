@@ -1,44 +1,142 @@
-"""Functions for entropy and splitting"""
+#%%writefile ./density_tree/decision_tree_create.py
+'''Functions for entropy and splitting with labelled data'''
+from .density_tree import *
 
-import numpy as np
-import pandas as pd
-
-
-def split(dataset, index, split_value):  # [2]
+class Node:
     """
-    split a dataset (columns: variables, rows: data) in two according to some column (index) value.
-    :param dataset: input dataset
-    :param index: index of dimension to split values on
-    :param split_value: value of the dimension where the dataset is split
-    :return: left and right split datasets
+    constructor for new nodes in a decision tree or density tree.
+    decision rule is the rule which splits labels in two groups labels_left and labels_right
+    left_rule and right_rule are pointers to the rules that have to be used
+    to further split labels_left and labels_right
     """
-    left, right = list(), list()
-    for row in dataset:
-        if row[index] < split_value:
-            left.append(row)
+
+    def __init__(self):
+        # data for node
+        self.parent = None  # parent node
+        self.split_value = None  # the split value
+        self.split_dimension = None  # the split dimension
+
+        # labelled data
+        self.labels = None  # the labels contained at this split level
+
+        # unlabelled data
+        self.entropy = None  # entropy, for unlabelled nodes
+        self.dataset = None
+        self.dataset_left = None
+        self.dataset_right = None
+
+        # child nodes
+        self.left = None  # node to the left, e.g., for value < split_value
+        self.right = None
+
+        # labelled data
+        self.left_labels = None
+        self.right_labels = None
+
+        # unlabelled data
+        self.left_entropy = None
+        self.right_entropy = None
+
+    def get_root(self):
+        if self.parent != None:
+            return self.parent.get_root()
         else:
-            right.append(row)
-    return left, right
+            return self
+
+    def has_children(self):
+        """print data for node"""
+        if (self.right != None) & (self.right != None):
+            return True
+        return False
+
+    def depth(self):
+        """get tree depth"""
+        left_depth = self.left.depth() if self.left else 0
+        right_depth = self.right.depth() if self.right else 0
+        return max(left_depth, right_depth) + 1
+
+    def highest_entropy(self, node, e, side):
+        """get the node in tree which has the highest entropy,
+        taking a root node as input.
+        for every node, check the entropies left and right after splitting
+        if the node is not split yet to one of the sides and the entropy on the unsplit side
+        exceeds the  maximum entropy, return the node.
+        """
+        if self.left_entropy is not None and self.left is None:
+            if self.left_entropy > e:
+                node = self
+                e = self.left_entropy
+                side = 'left'
+
+        if self.right_entropy is not None and self.right is None:
+            if self.right_entropy > e:
+                node = self
+                e = self.right_entropy
+                side = 'right'
+
+        if self.left is not None:
+            node_lower_l, e_lower_l, side_lower_l = self.left.highest_entropy(node, e, side)
+        if self.right is not None:
+            node_lower_r, e_lower_r, side_lower_r = self.right.highest_entropy(node, e, side)
+        if self.left is not None:
+            if e_lower_l > e:
+                node, e, side = node_lower_l, e_lower_l, side_lower_l
+        if self.right is not None:
+            if e_lower_r > e:
+                node, e, side = node_lower_r, e_lower_r, side_lower_r
+
+        return node, e, side
+
+    """traversal methods"""
+
+    def traverse_inorder(self):
+        if self.left is not None:
+            self.left.traverse_inorder()
+        self.__format__()
+        if self.right is not None:
+            self.right.traverse_inorder()
+
+    def traverse_preorder(self):
+        self.__format__()
+        if self.left is not None:
+            self.left.traverse_preorder()
+        if self.right is not None:
+            self.right.traverse_preorder()
+
+    def traverse_postorder(self):
+        if self.left is not None:
+            self.left.traverse_preorder()
+        if self.right is not None:
+            self.right.traverse_preorder()
+        self.__format__()
+        raise NotImplementedError
+
+    def __format__(self):
+        # print("rule: " + self.decisionrule) # print a decision rule on one line as a string (e.g., `d(2) < 20`)
+        print("labels: " + str(self.labels))
+        if self.has_children():
+            print("split dimension: " + str(self.split_dimension))
+            print("split value: " + str(self.split_value))
 
 
-def entropy(labels, base=np.e):  # [1]
-    """
+def entropy(labels, base = np.e):  # [1]
+    '''
     Calculate the entropy for a set of labels.
     :param labels: an array of labels
     :param base: base of entropy, by default e
     :return: entropy
-    """
+    '''
     value, counts = np.unique(labels, return_counts=True)
     norm_counts = counts / counts.sum()
     return -(norm_counts * np.log(norm_counts) / np.log(base)).sum()
 
 def entropy_discrete(dataset, dim):
-    """
+    '''
     calculate the entropy values for all cuts on one attribute (left<cut, right>=cut).
     :param dataset: Input array with data and label in rows. The last column contains the labels.
     :param dim: The index of the column for which the entropy should be computed.
     :return: entropy values, corresponding split values
-    """
+    '''
     x_vals, entropy_vals = list(), list()
     uniquevals = (np.unique(dataset[:, dim]))
     left_labels_unique, right_labels_unique = list(), list()
@@ -62,8 +160,8 @@ def entropy_discrete(dataset, dim):
         right_labels_unique.append(np.unique(right_labels))
 
         # entropy for split
-        left_entropy = entropy(left_labels, base=2)
-        right_entropy = entropy(right_labels, base=2)
+        left_entropy = entropy(left_labels, base = 2)
+        right_entropy = entropy(right_labels, base = 2)
 
         # total entropy for attribute
         # TODO change to information gain
@@ -71,14 +169,6 @@ def entropy_discrete(dataset, dim):
         entropy_vals.append(entropy_attr_split)
 
     return entropy_vals, x_vals, left_labels_unique, right_labels_unique
-
-
-def data_to_clusters(dataset):
-    """Helper function to get clusters from estimated labels"""
-    clusters = []
-    for val in np.unique(dataset[:, 2]):
-        clusters.append(dataset[dataset[:, 2] == val])
-    return clusters
 
 
 def get_unique_labels(labels):
@@ -93,9 +183,8 @@ def get_unique_labels(labels):
             # ul_side.append('several')
     return ul_side, ul_side_c
 
-
 def calc_entropy_attribute(dataset):
-    '''find the lowest entropy for a given attribute'''
+    """find the lowest entropy for a given attribute"""
     dfs = []
     entropy_attr = []
     x_attr = []
@@ -125,77 +214,43 @@ def calc_entropy_attribute(dataset):
         
     return dfs
 
-
-def get_best_attr(dfs):
-    """get the attribute cutting which the information gain is highest"""
-    min_e = np.infty
-
-    for i in range(len(dfs)):  # loop all variables
-        df = dfs[i]
-        min_df_attr = df.loc[df['entropy'].argmin()]
-        if min_df_attr['entropy'] < min_e:
-            min_e = min_df_attr['entropy']
-            min_df = pd.DataFrame(min_df_attr.drop("index")).transpose()
-            min_df["dimension"] = i
-
-    return min_df  # value of lowest entropy after possible cut, cut value, dimension
-
-
-def next_split(left, right, results, root):
+"""
+labelled
+"""
+def create_decision_tree(dataset, parent_node = None, side_label = None, max_depth = np.infty):
     """
-    recursive method to split variables on dimension until all variables are contained in one subspace. G
-    1. Get left (l) and right (r) based on split
-    2. Check if labels unique
-    3. Get entropies for all split values in ll rr
-    4. Recurse -> 1.
+    create decision tree be performing initial split, then recursively splitting until all labels are in unique bins
+    at the entry, we get a dataset with distinct labels that has to be split
+    :param dataset: labelled dataset [X,y]
+    :param max_depth: maximum depth of decision tree
     """
-    for side in (left, right):  # loop both sides
-        dt_node = Node() # decision tree node]
-        dt_node.parent = root
-        dt_node.labels = np.unique(np.asarray(side)[:, -1])  # get variables (in last column)
-        
-        if np.array_equal(left, side):
-            dt_node.parent.left = dt_node
-        elif np.array_equal(right, side):
-            dt_node.parent.right = dt_node
-
-        
-        
-        if len(dt_node.labels) > 1:  # if there are still more than one labels in a side
-            side = np.asarray(side)
-            dfs = calc_entropy_attribute(side)  # get entropies for all attributes within side
-            min_df = get_best_attr(dfs)  # get best split value
-            # dataframe
-            results.append(min_df)
-            
-            dt_node.split_value = min_df["cut value"].values[0]
-            dt_node.split_dimension = min_df["dimension"].values[0]
-            left_new, right_new = split(side, 
-                                        dt_node.split_dimension,
-                                        dt_node.split_value) # get new left and right labels
-            
-            # save results for dataframe
-            next_split(left_new, right_new, results, dt_node)  # split, recursion
-            
-def create_decision_tree(dimensions = 0, subsample = 0):
-    """create decision tree be performing initial split,
-    then recursively splitting until all labels are in unique bins
-    """
-    # TODO modify such as to take as entry number of variables to create tree on, number of data subsamples etc.
+    # TODO add data and variable subsample for RF
+    dim_max, val_dim_max, ig_dims_vals, split_dims_vals = get_best_split(dataset, labelled = True)
     
-    root = Node() # initial node
-    # initial split
-    dfs = calc_entropy_attribute(dataset)
-    min_df = get_best_attr(dfs)
+    # create binary tree node
+    treenode = Node() 
+    treenode.split_value = val_dim_max
+    treenode.split_dimension = dim_max
+    treenode.labels = np.unique(dataset[:,-1])
+    if parent_node is not None:
+        treenode.parent = parent_node
+        if side_label == 'left':
+            parent_node.left = treenode
+        elif side_label == 'right':
+            parent_node.right = treenode
     
-    root.split_value = min_df["cut value"].values[0]
-    root.split_dimension = min_df["dimension"].values[0]
-    root.labels = np.unique(dataset[:,-1])
-    
-    left,right=split(dataset, 
-                 min_df["dimension"].values[0], # dimension of min cut value
-                 min_df["cut value"].values[0]) # min cut value
-    results=[min_df]
     # recursively continue splitting
-    next_split(left, right, results, root) # iterate
-    return results, root
+    left, right = split(dataset, dim_max, val_dim_max) # split along best split dimension
+    treenode.left_labels = np.unique(left[:,-1])
+    treenode.right_labels = np.unique(right[:,-1])
+    
+    # check if current tree depth > max tree depth
+    current_tree_depth = treenode.get_root().depth()
+    
+    # continue splitting only if there are several distinct labels to a side and the maximum tree depth has not been reached yet.
+    # TODO: maybe we should split where maximum IG can be achieved.
+    if (len(np.unique(left[:,-1])) > 1) & (current_tree_depth < max_depth):
+        create_decision_tree(left, parent_node = treenode, side_label = 'left', max_depth = max_depth)
+    if (len(np.unique(right[:,-1])) > 1) & (current_tree_depth < max_depth):
+        create_decision_tree(right, parent_node = treenode, side_label = 'right', max_depth = max_depth)
+    return treenode
