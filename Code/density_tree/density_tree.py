@@ -144,10 +144,7 @@ def get_best_split(dataset, labelled=False):
 """
 unlabelled: working
 """
-
-
-def create_decision_tree_unlabelled(dataset, dimensions, clusters, subsample=0, parentnode=None,
-                                    side_label=None):
+def create_decision_tree_unlabelled(dataset, dimensions, clusters, parentnode=None, side_label=None):
     """create decision tree be performing initial split,
     then recursively splitting until all labels are in unique bins
     init: flag for first iteration
@@ -155,7 +152,6 @@ def create_decision_tree_unlabelled(dataset, dimensions, clusters, subsample=0, 
     As long as total number of splits < nclusters - 1, perform another split on the side having the higher entropy
     Or, if there are parent nodes: perform a split on the side of the node that has the highest entropy on a side
     """
-    # TODO modify such as to take as entry number of variables to create tree on, number of data subsamples etc.
     # split
     dim_max, val_dim_max, _, _ = get_best_split(dataset, labelled=False)
     left, right, e_left, e_right = split(dataset, dim_max, val_dim_max,
