@@ -7,7 +7,7 @@ def print_rule(node):
     return rule_string
 
 
-def printstuff(node, tree_string):
+def print_density_tree_latex(node, tree_string):
     """print decision tree in a LaTeX syntax for visualizing the decision tree
     To be called as:
     tree_string = ""
@@ -19,19 +19,50 @@ def printstuff(node, tree_string):
     if len(node.labels) > 1:
         tree_string += print_rule(node)
         print_rule(node)
-    # check if node has left labels
+
+    # check if node is leaf node
+    if node.left is None:
+        tree_string += "[" + str(int(node.left_entropy)) + "]"
+    # check if node is leaf node
+    if node.right is None:
+        tree_string += "[" + str(int(node.right_entropy)) + "]"
+
+    # iterate over node's children
+    if node.left is not None:
+        tree_string = print_density_tree_latex(node.left, tree_string)
+
+    if node.right is not None:
+        tree_string = print_density_tree_latex(node.right, tree_string)
+    tree_string += "]"
+
+    return tree_string
+
+
+def print_decision_tree_latex(node, tree_string):
+    """print decision tree in a LaTeX syntax for visualizing the decision tree
+    To be called as:
+    tree_string = ""
+    tree_string = printstuff(root,tree_string)
+    """
+    tree_string += "["
+
+    # check if node is split node
+    if len(node.labels) > 1:
+        tree_string += print_rule(node)
+        print_rule(node)
+    # check if node is leaf node
     if len(node.left_labels) == 1:
         tree_string += "[" + str(int(node.left_labels)) + "]"
-    # checkif node has right labels
+    # checkif node is leaf node
     if len(node.right_labels) == 1:
         tree_string += "[" + str(int(node.right_labels)) + "]"
 
     # iterate over node's children
     if len(node.left_labels) > 1:
-        tree_string = printstuff(node.left, tree_string)
+        tree_string = print_decision_tree_latex(node.left, tree_string)
 
     if len(node.right_labels) > 1:
-        tree_string = printstuff(node.right, tree_string)
+        tree_string = print_decision_tree_latex(node.right, tree_string)
     tree_string += "]"
 
     return tree_string

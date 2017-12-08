@@ -91,33 +91,39 @@ class Node:
 
     def traverse_inorder(self):
         if self.left is not None:
+            print('\n left')
             self.left.traverse_inorder()
         self.__format__()
         if self.right is not None:
+            print('\n right')
             self.right.traverse_inorder()
 
     def traverse_preorder(self):
         self.__format__()
         if self.left is not None:
+            print('\n left')
             self.left.traverse_preorder()
         if self.right is not None:
+            print('\n right')
             self.right.traverse_preorder()
 
     def traverse_postorder(self):
         if self.left is not None:
             self.left.traverse_preorder()
+            print('\n left')
         if self.right is not None:
             self.right.traverse_preorder()
+            print('\n right')
         self.__format__()
         raise NotImplementedError
 
     def __format__(self):
         # print("rule: " + self.decisionrule) # print a decision rule on one line as a string (e.g., `d(2) < 20`)
         print("labels: " + str(self.labels))
+        print("entropy: %.2f " % self.entropy)
         if self.has_children():
             print("split dimension: " + str(self.split_dimension))
-            print("split value: " + str(self.split_value))
-
+            print("split value: %.2f " % self.split_value)
 
 def entropy(labels, base = np.e):  # [1]
     '''

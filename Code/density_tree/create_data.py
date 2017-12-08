@@ -34,7 +34,7 @@ def createClusters(means, covs, npoints):
     return x, y
 
 
-def createData(clusters, dimensions, covariance, npoints, minRange=1, maxRange=100):
+def createData(clusters, dimensions, covariance, npoints, minRange=1, maxRange=100, labelled = True):
     """Create Gaussian distributed points, in n dimensions"""
     means = createMeans(clusters, dimensions, minRange, maxRange)
     covs = createCovs(clusters, dimensions, covariance)
@@ -42,12 +42,17 @@ def createData(clusters, dimensions, covariance, npoints, minRange=1, maxRange=1
     x, y = createClusters(means, covs, npoints)
 
     # zip for having tuples (x,y), round and unique for having discrete coordinates (eliminating duplicate points)
-    clusters = []
-    for i in range(len(x)):
-        clusters.append(np.unique(list(zip(x[i], y[i], np.ones(len(x[i])) * (i + 1))),
-                                  axis=0))  # np.ones: label 1 for first cluster
-    dataset = np.asarray(np.concatenate(clusters, axis=0))
-    return dataset, clusters
+    if labelled:
+        clusters = []
+        for i in range(len(x)):
+            clusters.append(np.unique(list(zip(x[i], y[i], np.ones(len(x[i])) * (i + 1))),
+                                      axis=0))  # np.ones: label 1 for first cluster
+                                                # TODO meaning of np.unique?
+        dataset = np.asarray(np.concatenate(clusters, axis=0))
+        return dataset, clusters
+    else:
+        dataset = np.asarray([list(zip[x[i], y[i]]) for i in range(len(x))])
+        return dataset
     # connect unique points of cluster 1 and cluster 2
 
 def data_to_clusters(dataset):

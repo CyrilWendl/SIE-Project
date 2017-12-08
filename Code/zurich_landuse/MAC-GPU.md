@@ -4,6 +4,9 @@ GPU installation not successful yet
 
 How to make Tensorflow work on Mac OS X using a GPU?
 
+MacOS 10.13.1: NVidia Drivers not up to data, therefore have to install Web Driver:
+[Forum Post](https://devtalk.nvidia.com/default/topic/1025945/mac-cuda-9-0-driver-fully-compatible-with-macos-high-sierra-10-13-error-quot-update-required-quot-solved-/])
+
 Respect all the versions (don't use newer ones!)
 
 ## 1. Prerequisites
@@ -67,7 +70,6 @@ cd /usr/local/cuda/samples/
 ```
 
 ## 3. Clone the TensorFlow repository
-
 Clone the repo:
 
 `$ git clone https://github.com/tensorflow/tensorflow `
@@ -79,9 +81,18 @@ $ git checkout 1.1 # >1.2 doesn't support GPU
 ```
 
 ## 4. Configure and build TensorFlow
-
 ## 5. Verify GPU is showing up
 ```python
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 ``` 
+# Userful Links
+## Various
+- [CUDA on OS X 12.13.1](https://devtalk.nvidia.com/default/topic/1025945/mac-cuda-9-0-driver-fully-compatible-with-macos-high-sierra-10-13-error-quot-update-required-quot-solved-/)
+## AWS
+- [150$ education pack](https://education.github.com/pack)
+- [TensorFlow + AWS setup tutorial](https://medium.com/sigmoidal/tensorflow-1-0-is-here-lets-do-some-deep-learning-on-the-amazon-cloud-9234eab31fa5)
+- [Locally using Jupyter Notebook](https://towardsdatascience.com/setting-up-and-using-jupyter-notebooks-on-aws-61a9648db6c5)
+
+## Google Cloud
+- [Jupyter + Tensorflow + Nvidia GPU + Docker + Google Compute Engine](https://medium.com/google-cloud/jupyter-tensorflow-nvidia-gpu-docker-google-compute-engine-4a146f085f17)
