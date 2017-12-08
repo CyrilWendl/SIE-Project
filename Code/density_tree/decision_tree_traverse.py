@@ -18,6 +18,7 @@ def descend_decision_tree(data_point, node):
         return descend_decision_tree(data_point, node.right)
 
 def descend_decision_tree_aux(dataset, root):
+    """for all data points, predict a label"""
     dataset_eval = []
     for i in dataset: # loop all data points
         # get labels

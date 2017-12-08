@@ -4,8 +4,9 @@ from matplotlib.pyplot import cm
 import matplotlib.pylab as plt
 import numpy as np
 
+
 def plotData(data, title, ax, clusters=None, save=False, linesX=None, linesY=None,
-             labels=True, minRange=1, maxRange=100, covariance=2, grid_eval = None, showData = True):
+             labels=True, minRange=1, maxRange=100, covariance=2, grid_eval=None, showData=True, covs=None, means=None):
     """
     Generic function to plot randomly generated labelled or unlabelled data.
     :param data: the data to plot
@@ -31,7 +32,6 @@ def plotData(data, title, ax, clusters=None, save=False, linesX=None, linesY=Non
         else:
             ax.plot(data[:, 0], data[:, 1], '.')
 
-
     ax.set_title(title)
 
     # draw split lines after partitioning
@@ -54,14 +54,30 @@ def plotData(data, title, ax, clusters=None, save=False, linesX=None, linesY=Non
         # Put the result into a color plot
         Z = Z.reshape(xx.shape)
         ax.pcolormesh(xx, yy, Z, alpha=0.2, cmap='rainbow')
-        #ax.set_clim(y.min(), y.max())
+        # ax.set_clim(y.min(), y.max())
 
     ax.set_xlim([minRange - 4 * covariance, maxRange + 4 * covariance])
     ax.set_ylim([minRange - 4 * covariance, maxRange + 4 * covariance])
 
+    # covariance
+    def eigsorted(cov):
+        vals, vecs = np.linalg.eigh(cov)
+        order = vals.argsort()[::-1]
+        return vals[order], vecs[:, order]
+    nstd = 2
+    if covs is not None:
+        for i in range(len(covs)):
+            vals, vecs = eigsorted(covs[i])
+            theta = np.degrees(np.arctan2(*vecs[:, 0][::-1]))
+            w, h = 2 * nstd * np.sqrt(vals)
+            ell = Ellipse(xy=means[i],
+                          width=w, height=h,
+                          angle=theta, color='red')
+            ell.set_facecolor('none')
+            ax.add_artist(ell)
+
     if (save):
         plt.savefig('/Users/cyrilwendl/Documents/EPFL/Projet SIE/SIE-Project/random_data.pdf', bbox_inches='tight')
-
 
 def visualize_decision_boundaries(dataset, rootnode, minRange, maxRange, rf=False):
     """visualize decision boundaries for a given decision tree"""

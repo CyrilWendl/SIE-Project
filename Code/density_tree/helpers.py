@@ -15,17 +15,16 @@ def print_density_tree_latex(node, tree_string):
     """
     tree_string += "["
 
-    # check if node is split node
-    if len(node.labels) > 1:
-        tree_string += print_rule(node)
-        print_rule(node)
+    tree_string += print_rule(node)
+    #print(tree_string)
+    print_rule(node)
 
     # check if node is leaf node
     if node.left is None:
-        tree_string += "[" + str(int(node.left_entropy)) + "]"
+        tree_string += "[ent:%.2f]"  % node.left_entropy
     # check if node is leaf node
     if node.right is None:
-        tree_string += "[" + str(int(node.right_entropy)) + "]"
+        tree_string += "[ent:%.2f]"  % node.right_entropy
 
     # iterate over node's children
     if node.left is not None:
@@ -81,4 +80,3 @@ def get_grid_labels(dataset, root, minRange, maxRange, density=100, rf=False):
     else:  # decision tree
         dataset_grid_eval = descend_decision_tree_aux(dataset_grid, root)
     return dataset_grid_eval[:, -1]
-

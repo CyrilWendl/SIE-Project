@@ -51,9 +51,9 @@ def createData(clusters, dimensions, covariance, npoints, minRange=1, maxRange=1
         dataset = np.asarray(np.concatenate(clusters, axis=0))
         return dataset, clusters
     else:
-        dataset = np.asarray([list(zip[x[i], y[i]]) for i in range(len(x))])
+        dataset=np.asarray([np.asarray(x).flatten(),np.asarray(y).flatten()]).T
+        print(dataset.shape)
         return dataset
-    # connect unique points of cluster 1 and cluster 2
 
 def data_to_clusters(dataset):
     '''Helper function to get clusters from estimated labels'''
