@@ -4,6 +4,7 @@
 """
 import numpy as np
 
+
 def descend_decision_tree(data_point, node):
     """given some test data and decision tree, assign the correct label using a decision tree"""
 
@@ -17,14 +18,15 @@ def descend_decision_tree(data_point, node):
             return int(node.right_labels)
         return descend_decision_tree(data_point, node.right)
 
+
 def descend_decision_tree_aux(dataset, root):
     """for all data points, predict a label"""
     dataset_eval = []
-    for i in dataset: # loop all data points
+    for i in dataset:  # loop all data points
         # get labels
-        label=descend_decision_tree(i, root)
+        label = descend_decision_tree(i, root)
         # append to dataset
-        dataset_eval.append(np.concatenate([i,[label]]))
+        dataset_eval.append(np.concatenate([i, [label]]))
 
-    dataset_eval=np.asarray(dataset_eval)
+    dataset_eval = np.asarray(dataset_eval)
     return dataset_eval

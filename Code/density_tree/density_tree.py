@@ -1,9 +1,9 @@
 """
 Density Tree Data Structure
 """
-from . import *
 
-class Density_Node:
+
+class DensityNode:
     """
     constructor for new nodes in a density tree.
     """
@@ -31,14 +31,14 @@ class Density_Node:
         self.right_mean = None
 
     def get_root(self):
-        if self.parent != None:
+        if self.parent is not None:
             return self.parent.get_root()
         else:
             return self
 
     def has_children(self):
         """print data for node"""
-        if (self.right != None) & (self.right != None):
+        if (self.right is not None) & (self.right is not None):
             return True
         return False
 
@@ -78,15 +78,15 @@ class Density_Node:
 
         return node, e, side
 
-    def __format__(self):
-        print("-" * 15 + "\nDensity Tree Node: \n" + "-" * 15 + "\n split dimension: %i " % self.split_dimension)
-        print("split value: %.2f \n" % self.split_value)
+    def __format__(self, **kwargs):
+        print('-' * 15 + '\nDensity Tree Node: \n' + '-' * 15 + '\n split dimension: ' + str(self.split_dimension))
+        print("split value: " + str(self.split_value))
 
-        print("entropy: %.2f " % self.entropy)
-        print("mean: " + str(self.mean))
-        print("cov: " + str(self.cov))
-        print("left entropy: %.2f " % self.left_entropy)
-        print("right entropy: %.2f \n" % self.right_entropy)
+        print('entropy: ' + str(self.entropy))
+        print('mean: ' + str(self.mean))
+        print('cov: ' + str(self.cov))
+        print('left entropy: ' + str(self.left_entropy))
+        print('right entropy:' + str(self.right_entropy))
 
         print("node height: %i " % (self.get_root().depth() - self.depth()))
 
