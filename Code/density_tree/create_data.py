@@ -20,7 +20,9 @@ def create_data(n_clusters, dimensions, covariance, npoints, minrange=1, maxrang
     :param random_flip: whether to randomly reverse the cluster covariance or not
     :param nonlinearities: whether to randomly transform clusters to nonlinear distributions
     """
-    clusters = []
+
+    dataset = []
+    labels = []
     for idx_c, c in enumerate(range(n_clusters)):
         make_nonlinear = False
         if nonlinearities:
@@ -33,63 +35,62 @@ def create_data(n_clusters, dimensions, covariance, npoints, minrange=1, maxrang
         for d in range(dimensions):
             mean_c.append(np.random.randint(int(minrange + data_range / 10), int(maxrange - data_range / 10)))
 
-        cov_c = covariance.copy()
+        # reshape covariance
+        cov_c = np.identity(dimensions) * covariance
 
         # cluster covariance
         if random_flip:
             # randomly flip covariances (e.g., [10, 20] to [20, 10])
             if np.random.randint(0, 2):
-                cov_c = np.fliplr(np.asarray([cov_c]))
-                cov_c = cov_c.flatten()
+                # get a random dimension, and increase / decrease it by a rand int between +- covariance
+                cov_dim_change = np.random.randint(0, dimensions)
+                rand_incr = np.random.randint(-covariance, covariance)
+                cov_c[cov_dim_change, cov_dim_change] += cov_c[cov_dim_change, cov_dim_change] + rand_incr
 
         # if nonlinear, elongate covariance
         if make_nonlinear:
-            dim = np.random.randint(0, 2)
-            cov_c[dim] = 1  # set one dimension to 1
-            cov_c[dim == 0] = cov_c[dim == 0] * 4  # elongate the other dimension more
-
-        # reshape covariance
-        cov_c = np.identity(dimensions) * cov_c
+            dim = np.random.randint(0, dimensions)
+            cov_c[dim, dim] = 1  # set one dimension to 1
+            cov_c[dim == 0, dim == 0] = cov_c[dim == 0, dim == 0] * 4  # elongate the other dimensions more
 
         # generate cluster points
-        x, y = np.random.multivariate_normal(mean_c, cov_c, npoints).T
+        pts = np.random.multivariate_normal(mean_c, cov_c, npoints).T
 
         # if nonlinear, curve points
         if make_nonlinear:
             distort_x = np.random.randint(0, 2)
             distort_y = np.random.randint(0, 2)
             if distort_x:  # random if done or not
-                y_min = np.min(y, axis=0)
-                y_max = np.max(y, axis=0)
+                y_min = np.min(pts[1], axis=0)
+                y_max = np.max(pts[1], axis=0)
 
-                dy = (y - y_min) / (y_max - y_min)
+                dy = (pts[1] - y_min) / (y_max - y_min)
                 if np.random.randint(0, 2):  # random if done or not
-                    x += gaussian(dy, .5, .25) * dy * 50
+                    pts[0] += gaussian(dy, .5, .25) * dy * 50
                 else:
-                    x -= gaussian(dy, .5, .25) * dy * 50
+                    pts[0] -= gaussian(dy, .5, .25) * dy * 50
             if distort_x == 0 or distort_y:  # random if done or noT
-                x_min = np.min(x, axis=0)
-                x_max = np.max(x, axis=0)
+                x_min = np.min(pts[0], axis=0)
+                x_max = np.max(pts[0], axis=0)
 
-                dx = (x - x_min) / (x_max - x_min)
+                dx = (pts[0] - x_min) / (x_max - x_min)
                 if np.random.randint(0, 2):  # random if done or not
-                    y += gaussian(dx, .5, .25) * dx * 50
+                    pts[1] += gaussian(dx, .5, .25) * dx * 50
                 else:
-                    y -= gaussian(dx, .5, .25) * dx * 50
+                    pts[1] -= gaussian(dx, .5, .25) * dx * 50
 
         # last, check we want to add the labels or not
-        clusters.append(np.unique(list(zip(x, y, np.ones(len(x)) * (idx_c + 1))), axis=0))
+        labels.append(np.ones(len(pts[0])) * (idx_c + 1))
+        dataset.append(pts)
 
-    x = [c[:, 0] for c in clusters]
-    y = [c[:, 1] for c in clusters]
-    clusters = np.asarray(clusters)
-    if labelled:
-        label = [c[:, 2] for c in clusters]
-        dataset = np.asarray([np.asarray(x).flatten(), np.asarray(y).flatten(), np.asarray(label).flatten()]).T
-        return dataset, clusters
-    else:
-        dataset = np.asarray([np.asarray(x).flatten(), np.asarray(y).flatten()]).T
-        return dataset
+    labels = np.asarray(labels).flatten()
+
+    dataset = np.concatenate(dataset, axis=1) # merge all clusters to one big matrix [(n_pts*ncluster) * n_dims]
+
+    if labelled: # add label on top, return clusters
+        dataset = np.concatenate((dataset,[labels]))
+
+    return dataset.T
 
 
 def data_to_clusters(dataset):

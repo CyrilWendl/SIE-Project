@@ -14,6 +14,8 @@ def create_density_tree(dataset, dimensions, clusters, parentnode=None, side_lab
     """
 
     # split
+    print("Creating new node")
+
     dim_max, val_dim_max, _, _ = get_best_split(dataset, labelled=False)
     left, right, e_left, e_right = split(dataset, dim_max, val_dim_max,
                                          get_entropy=True)  #  split along best dimension

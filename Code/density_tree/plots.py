@@ -6,7 +6,7 @@ import matplotlib.pylab as plt
 import numpy as np
 
 
-def plot_data(data, title, ax, clusters=None, save=False, lines_x=None, lines_y=None,
+def plot_data(data, title, ax, n_clusters=None, save=False, lines_x=None, lines_y=None,
               labels=True, minrange=1, maxrange=100, covariance=2, grid_eval=None, show_data=True, means=None,
               covs=None):
     """
@@ -14,7 +14,7 @@ def plot_data(data, title, ax, clusters=None, save=False, lines_x=None, lines_y=
     :param data: the data to plot
     :param title: the title of the plot
     :param ax: axis where to draw the plot
-    :param clusters: clusters of labelled data
+    :param n_clusters: number of clusters in data
     :param lines_x: x splitting lines to plot
     :param lines_y: y splitting lines to plot
     :param save: [True | False]save plot to a pdf file
@@ -29,7 +29,7 @@ def plot_data(data, title, ax, clusters=None, save=False, lines_x=None, lines_y=
     """
     if show_data:
         if labels:
-            color = iter(cm.rainbow(np.linspace(0, 1, len(clusters))))
+            color = iter(cm.rainbow(np.linspace(0, 1, n_clusters)))
             for i, c in enumerate(data):
                 color_cluster = next(color)
                 ax.scatter(c[:, 0], c[:, 1], s=40, color=color_cluster)
@@ -102,10 +102,10 @@ def visualize_decision_boundaries(dataset, rootnode, minrange, maxrange, rf=Fals
     fig.set_size_inches((12, 8))
 
     fig.set_size_inches((15, 6))
-    plot_data(clusters, "Training Data and Splits", axes[0], clusters=clusters, minrange=minrange,
+    plot_data(clusters, "Training Data and Splits", axes[0], n_clusters=len(clusters), minrange=minrange,
               maxrange=maxrange, covariance=0, grid_eval=dataset_grid_eval, show_data=True)
 
-    plot_data(clusters, "Splits", axes[1], clusters=clusters, minrange=minrange,
+    plot_data(clusters, "Splits", axes[1], n_clusters=len(clusters), minrange=minrange,
               maxrange=maxrange, covariance=0, grid_eval=dataset_grid_eval, show_data=False)
 
     plt.show()
