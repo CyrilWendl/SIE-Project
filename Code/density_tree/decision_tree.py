@@ -41,7 +41,6 @@ class DecisionNode:
         return max(left_depth, right_depth) + 1
 
     """traversal methods"""
-
     def traverse_inorder(self):
         if self.left is not None:
             print('\n left')
