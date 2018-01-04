@@ -1,7 +1,10 @@
 import os
+import warnings
 
 # Custom Libraries
+from density_tree.density_forest import *
 from density_tree.density_tree_create import *
+from density_tree.density_tree_traverse import *
 from density_tree.create_data import *
 from density_tree.helpers import *
 from density_tree.plots import *
@@ -104,3 +107,10 @@ if dimensions == 2:
     figure, axes = plt.subplots(nrows=1, ncols=1)
     plot_data(dataset, "Unlabelled data", axes, labels=False, covs=covs, means=means)
     plt.show()
+
+warnings.filterwarnings("ignore")
+
+root_nodes = density_forest_create(dataset, dimensions, nclusters, 10, .3, -1)
+
+probas = density_forest_traverse(dataset, root_nodes)
+print(np.mean(probas))

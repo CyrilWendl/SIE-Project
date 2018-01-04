@@ -14,7 +14,6 @@ def create_density_tree(dataset, dimensions, clusters, parentnode=None, side_lab
     """
 
     # split
-    print("Creating new node")
 
     dim_max, val_dim_max, _, _ = get_best_split(dataset, labelled=False)
     left, right, e_left, e_right = split(dataset, dim_max, val_dim_max,
@@ -25,9 +24,14 @@ def create_density_tree(dataset, dimensions, clusters, parentnode=None, side_lab
     # save tree node
     treenode.split_dimension = dim_max
     treenode.split_value = val_dim_max
+
     treenode.dataset = dataset
-    treenode.dataset_left = left
-    treenode.dataset_right = right
+    treenode.left_dataset = left
+    treenode.right_dataset = right
+
+    treenode.dataset_len = len(dataset)
+    treenode.left_dataset_len = len(left)
+    treenode.right_dataset_len = len(right)
     treenode.entropy = entropy_gaussian(dataset)
     treenode.cov = np.cov(dataset.T)
     treenode.mean = np.mean(dataset, axis=0)
@@ -54,13 +58,12 @@ def create_density_tree(dataset, dimensions, clusters, parentnode=None, side_lab
         node_e, e, side = treenode.get_root().highest_entropy(dataset, 0, 'None')
 
         if side == 'left':
-            dataset = node_e.dataset_left
+            dataset = node_e.left_dataset
             side_label = 'left'
         elif side == 'right':
-            dataset = node_e.dataset_right
+            dataset = node_e.right_dataset
             side_label = 'right'
 
-        print(treenode.entropy)
         create_density_tree(dataset, dimensions, clusters=clusters_left,
                             parentnode=node_e, side_label=side_label)  # iterate
 

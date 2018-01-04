@@ -54,15 +54,15 @@ def random_forest_traverse(dataset, root_nodes):
     # get labels for dataset
     dataset_eval = []
     # traverse all points
-    for i in tqdm_notebook(dataset):
+    for d in tqdm_notebook(dataset):
         # traverse all trees
         label = []
         for tree in root_nodes:
-            label.append(descend_decision_tree(i, tree))
+            label.append(descend_decision_tree(d, tree))
         # get most frequent label
         counts = np.bincount(label)
         label = np.argmax(counts)
-        dataset_eval.append(np.concatenate([i, [label]]))
+        dataset_eval.append(np.concatenate([d, [label]]))
 
     dataset_eval = np.asarray(dataset_eval)
     return dataset_eval

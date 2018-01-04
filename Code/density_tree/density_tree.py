@@ -13,6 +13,8 @@ class DensityNode:
         self.parent = None  # parent node
         self.split_value = None  # the split value
         self.split_dimension = None  # the split dimension
+        self.dataset = None
+
 
         # unlabelled data
         self.entropy = None  # entropy, for unlabelled nodes
@@ -20,15 +22,17 @@ class DensityNode:
         self.mean = None  # mean of data points in node
 
         # child nodes
-        self.left = None  # node to the left, e.g., for value < split_value
-        self.right = None
-
+        self.left = None
         self.left_entropy = None
         self.left_cov = None
         self.left_mean = None
+        self.left_dataset = None
+
+        self.right = None
         self.right_entropy = None
         self.right_cov = None
         self.right_mean = None
+        self.right_dataset = None
 
     def get_root(self):
         if self.parent is not None:
@@ -89,32 +93,3 @@ class DensityNode:
         print('right entropy:' + str(self.right_entropy))
 
         print("node height: %i " % (self.get_root().depth() - self.depth()))
-
-    """traversal methods"""
-
-    def traverse_inorder(self):
-        if self.left is not None:
-            print('\n left')
-            self.left.traverse_inorder()
-        self.__format__()
-        if self.right is not None:
-            print('\n right')
-            self.right.traverse_inorder()
-
-    def traverse_preorder(self):
-        self.__format__()
-        if self.left is not None:
-            print('\n left')
-            self.left.traverse_preorder()
-        if self.right is not None:
-            print('\n right')
-            self.right.traverse_preorder()
-
-    def traverse_postorder(self):
-        if self.left is not None:
-            self.left.traverse_preorder()
-            print('\n left')
-        if self.right is not None:
-            self.right.traverse_preorder()
-            print('\n right')
-        self.__format__()
