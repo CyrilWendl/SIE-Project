@@ -60,6 +60,7 @@ def create_density_tree(dataset, dimensions, clusters, parentnode=None, side_lab
             dataset = node_e.dataset_right
             side_label = 'right'
 
+        print(treenode.entropy)
         create_density_tree(dataset, dimensions, clusters=clusters_left,
                             parentnode=node_e, side_label=side_label)  # iterate
 
