@@ -91,7 +91,7 @@ def plot_data(data, title, ax, n_clusters=None, save=False, lines_x=None, lines_
         plt.savefig('/Users/cyrilwendl/Documents/EPFL/Projet SIE/SIE-Project/random_data.pdf', bbox_inches='tight')
 
 
-def visualize_decision_boundaries(dataset, rootnode, minrange, maxrange, rf=False):
+def visualize_decision_boundaries(dataset, rootnode, minrange, maxrange, rf=False, save=False, savename=None):
     """visualize decision boundaries for a given decision tree"""
     # plot data
 
@@ -107,6 +107,9 @@ def visualize_decision_boundaries(dataset, rootnode, minrange, maxrange, rf=Fals
 
     plot_data(clusters, "Splits", axes[1], n_clusters=len(clusters), minrange=minrange,
               maxrange=maxrange, covariance=0, grid_eval=dataset_grid_eval, show_data=False)
+
+    if save:
+        plt.savefig(savename, bbox_inches='tight', pad_inches=0)
 
     plt.show()
 

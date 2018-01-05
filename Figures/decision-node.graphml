@@ -20,7 +20,8 @@
           <y:Geometry height="86.0" width="96.0" x="456.0" y="79.0"/>
           <y:Fill hasColor="false" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Latin Modern Roman" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="21.003999710083008" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="58.44399642944336" x="18.77800178527832" y="32.498000144958496">self.parent<y:LabelModel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Latin Modern Roman" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.007999420166016" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="58.44399642944336" x="18.77800178527832" y="23.996000289916992">self.parent
+self.labels<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
             </y:LabelModel>
             <y:ModelParameter>
@@ -52,16 +53,13 @@ self.split_value<y:LabelModel>
     <node id="n2">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="128.0" width="150.0" x="561.3867405375344" y="43.56539823848547"/>
+          <y:Geometry height="63.0" width="111.75587245088445" x="561.3867405375344" y="90.5"/>
           <y:Fill hasColor="false" transparent="false"/>
           <y:BorderStyle hasColor="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Latin Modern Roman" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="123.02799797058105" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="134.00799560546875" x="11.99200439453125" y="2.4860010147094727">self.get_root()
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Latin Modern Roman" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="72.01599884033203" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="104.7760009765625" x="2.9798714743219534" y="-4.507999420166016">self.get_root()
 self.has_children()
 self.depth()
-self.__format__()
-self.traverse_inorder()
-self.traverse_preoder()
-self.traverse_postorder()<y:LabelModel>
+self.__format__()<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
             </y:LabelModel>
             <y:ModelParameter>
@@ -118,6 +116,23 @@ self.right_labels<y:LabelModel>
             </y:LabelModel>
             <y:ModelParameter>
               <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n5">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="11.904991101431733" width="137.13024360387556" x="455.99999999999994" y="72.33808676326832"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Latin Modern Roman" fontSize="12" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="21.136001586914062" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="122.40400695800781" x="-12.489545562744468" y="-25.136001586914062">Class DecisionNode<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="-0.39796456935409674" labelRatioY="0.5" nodeRatioX="-0.5" nodeRatioY="-0.5" offsetX="0.0" offsetY="-4.0" upX="0.0" upY="-1.0"/>
             </y:ModelParameter>
           </y:NodeLabel>
           <y:Shape type="rectangle"/>

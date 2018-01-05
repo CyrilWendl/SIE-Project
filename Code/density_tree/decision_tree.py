@@ -40,35 +40,6 @@ class DecisionNode:
         right_depth = self.right.depth() if self.right else 0
         return max(left_depth, right_depth) + 1
 
-    """traversal methods"""
-    def traverse_inorder(self):
-        if self.left is not None:
-            print('\n left')
-            self.left.traverse_inorder()
-        self.__format__()
-        if self.right is not None:
-            print('\n right')
-            self.right.traverse_inorder()
-
-    def traverse_preorder(self):
-        self.__format__()
-        if self.left is not None:
-            print('\n left')
-            self.left.traverse_preorder()
-        if self.right is not None:
-            print('\n right')
-            self.right.traverse_preorder()
-
-    def traverse_postorder(self):
-        if self.left is not None:
-            self.left.traverse_preorder()
-            print('\n left')
-        if self.right is not None:
-            self.right.traverse_preorder()
-            print('\n right')
-        self.__format__()
-        raise NotImplementedError
-
     def __format__(self, **kwargs):
         print("labels: " + str(self.labels))
         if self.has_children():
